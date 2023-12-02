@@ -1,0 +1,14 @@
+name: Test PowerShell Registry modules
+on: push
+
+jobs:
+  pester-test:
+    name: Pester test
+    runs-on: windows-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+      - name: Run Pester tests
+        shell: pwsh
+        run: |
+          Invoke-Pester -Path .\tests
