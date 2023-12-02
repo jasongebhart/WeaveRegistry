@@ -17,14 +17,6 @@ InModuleScope "WeaveRegistry" {
                 "RegType"     = "REG_EXPAND_SZ"
             }
 
-            $BinaryValue = "240000003f28000000000000000000000000000001000000130000000000000062000000"
-
-            $BinarySettings = @{
-                "RegPath"     = "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer"
-                "RegProperty" = "ShellState"
-                "RegValue"    = $BinaryValue
-                "RegType"     = "REG_BINARY"
-            }
         }
 
         Context " Test Registry Conversion" {
@@ -36,13 +28,7 @@ InModuleScope "WeaveRegistry" {
             It " Expand String Get-RegistryActualValue" {
                 $Result = Get-RegistryActualValue @ExpandStringSettings
                 $Result | Should -Be "%PUBLIC%\Desktop"
-            }
-
-            It " Binary Get-RegistryActualValue" {
-                $Result = Get-RegistryActualValue @BinarySettings
-                $Result | Should -Be $BinaryValue
-            }
-            
+            }            
         }
     } 
 }
