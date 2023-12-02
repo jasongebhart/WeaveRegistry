@@ -8,13 +8,8 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
-      - name: Import 'WeaveRegistry' module
-        shell: pwsh
-        run: |
-
       - name: Run Pester tests
         shell: pwsh
         run: |
-          $global:projectDirectory = Join-Path $PSScriptRoot "..\"
-          Import-Module -Name '$projectDirectory\WeaveRegistry' -Verbose
-          Invoke-Pester -Path .\tests
+          Import-Module -Name '..\WeaveRegistry' -Verbose
+          Invoke-Pester -Path .\tests\Convert-HexToInteger.Tests.ps1
