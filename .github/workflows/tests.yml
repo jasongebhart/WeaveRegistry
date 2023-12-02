@@ -8,6 +8,10 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
+      - name: Import 'WeaveRegistry' module
+        shell: pwsh
+        run: |
+          Import-Module -Name 'WeaveRegistry' -Force
       - name: Run Pester tests
         shell: pwsh
         run: |
