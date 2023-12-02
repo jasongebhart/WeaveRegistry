@@ -25,19 +25,19 @@ InModuleScope "WeaveRegistry" {
             }
         }
 
-        Context "Test Registry Conversion" {
+        Context " Test Registry Conversion " {
             It "DWORD Get-RegistryActualValue" {
                 $Result = Get-RegistryActualValue @RegSettings
                 $Result | Should -Be 0
             }
 
-            It "Expand String Get-RegistryActualValue" {
+            It " Expand String Get-RegistryActualValue " {
                 $Result = Get-RegistryActualValue @ExpandStringSettings
                 $Result | Should -Be "%PUBLIC%\Desktop"
             }
 
-            It "Binary Get-RegistryActualValue" {
-                $BinaryValue = "240000003428000000000000000000000000000001000000130000000000000062000000"
+            It " Binary Get-RegistryActualValue " {
+                $BinaryValue = "240000003f28000000000000000000000000000001000000130000000000000062000000"
                 $Result = Get-RegistryActualValue @BinarySettings
                 $Result | Should -Be $BinaryValue
 

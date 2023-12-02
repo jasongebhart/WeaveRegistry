@@ -918,7 +918,7 @@ Function Test-RegistryHiveMounted {
     #>
     [CmdletBinding()]
     param (
-        [Parameter(Position = 0, Mandatory = $false, ValeFromPipeline = $true)]
+        [Parameter(Position = 0, Mandatory = $false, ValueFromPipeline = $true)]
         [string]$Name = "TestHive"
     )
 
