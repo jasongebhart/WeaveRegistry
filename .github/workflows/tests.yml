@@ -12,4 +12,4 @@ jobs:
         shell: pwsh
         run: |
           Import-Module -Name '..\WeaveRegistry' -Verbose
-          Invoke-Pester -Path .\tests\Convert-HexToInteger.Tests.ps1
+          Invoke-Pester -Path .\tests
