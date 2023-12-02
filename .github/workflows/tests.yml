@@ -11,7 +11,8 @@ jobs:
       - name: Import 'WeaveRegistry' module
         shell: pwsh
         run: |
-          Import-Module -Name 'WeaveRegistry' -Force
+          $global:projectDirectory = Join-Path $PSScriptRoot "..\"
+          Import-Module -Name '$projectDirectory\WeaveRegistry' -Verbose
       - name: Run Pester tests
         shell: pwsh
         run: |
