@@ -44,18 +44,22 @@ function Expand-String {
         [switch]$ExpandEnvironmentVariables
     )
 
-    if ($ExpandEnvironmentVariables) {
-        $expandedValue = [Environment]::ExpandEnvironmentVariables($Value)
-    }
-    else {
-        $expandedValue = $ExecutionContext.InvokeCommand.ExpandString($Value)
-    }
+    try {
+        if ($ExpandEnvironmentVariables) {
+            $expandedValue = [Environment]::ExpandEnvironmentVariables($Value)
+            Write-Verbose "[$($MyInvocation.MyCommand)] - Expanded Environment Value: $expandedValue"
+        }
+        else {
+            $expandedValue = $ExecutionContext.InvokeCommand.ExpandString($Value)
+            Write-Verbose "[$($MyInvocation.MyCommand)] - Expanded Value: $expandedValue"
+        }
 
-    Write-Verbose "[$($MyInvocation.MyCommand)] - Expanded Value: $expandedValue"
-    $expandedValue
+        $expandedValue
+    } catch {
+        Write-Error "An error occurred while expanding the string: $_"
+        throw $_
+    }
 }
-
-
 
 Function Compare-RegistryPropertyByObject {
     <#
@@ -772,13 +776,8 @@ function Set-RegistryPropertyByObject {
         Sets registry properties based on the specified registry settings.
 
     .NOTES
-        File Name      : Set-RegistryPropertyByObject.ps1
-        Author         : Your Name
-        Requires       : PowerShell V2
-        Copyright 2023 - Your Company Name
 
     .LINK
-        https://yourdocumentationlink.com
     #>
     [cmdletbinding()]
     param (
@@ -866,17 +865,17 @@ Function Set-Registry {
     Begin {}
 
     Process {
-        Write-Verbose -Message "[$($MyInvocation.MyCommand)] - Registry Set Start-------------"
-        Write-Verbose -Message "[$($MyInvocation.MyCommand)] - Registry Path: $RegPath"
-        Write-Verbose -Message "[$($MyInvocation.MyCommand)] - Registry Property: $RegProperty"
-        Write-Verbose -Message "[$($MyInvocation.MyCommand)] - Registry Value: $RegValue"
-        Write-Verbose -Message "[$($MyInvocation.MyCommand)] - Registry Type: $RegType"
+        Write-Verbose "[$($MyInvocation.MyCommand)] - Registry Set Start-------------"
+        Write-Verbose "[$($MyInvocation.MyCommand)] - Registry Path: $RegPath"
+        Write-Verbose "[$($MyInvocation.MyCommand)] - Registry Property: $RegProperty"
+        Write-Verbose "[$($MyInvocation.MyCommand)] - Registry Value: $RegValue"
+        Write-Verbose "[$($MyInvocation.MyCommand)] - Registry Type: $RegType"
 
         If (-not(Test-Path -Path $RegPath)) {
-            Write-Verbose -Message "[$($MyInvocation.MyCommand)] - Creating $RegPath"
-            New-Item -Path $RegPath -force -ErrorAction SilentlyContinue
+            Write-Verbose "[$($MyInvocation.MyCommand)] - Creating registry path: $RegPath"
+            New-Item -Path $RegPath -Force
         } else {
-            Write-Verbose -Message "[$($MyInvocation.MyCommand)] - Path Exists: $RegPath"
+            Write-Verbose "[$($MyInvocation.MyCommand)] - Path already exists: $RegPath"
         }
 
         If ($PSCmdlet.ShouldProcess("Setting $RegProperty in the Registry")) {
@@ -885,16 +884,21 @@ Function Set-Registry {
                 Name        = $RegProperty
                 Value       = $RegValue
                 Type        = $RegType
-                ErrorAction = "SilentlyContinue"
+                ErrorAction = "Stop" # Change to "Stop" for more detailed error messages
             }
-            Write-Verbose -Message "[$($MyInvocation.MyCommand)] - Property Type: $($parameters.Type)" 
-            Set-ItemProperty @parameters
+            try {
+                Write-Verbose "[$($MyInvocation.MyCommand)] - Setting registry property: $RegProperty"
+                Set-ItemProperty @parameters
+            } catch {
+                Write-Error "Failed to set registry property: $_"
+                throw $_
+            }
         } else {
-            # If ShouldProcess is false, do nothing
+            Write-Verbose "[$($MyInvocation.MyCommand)] - Setting $RegProperty in the Registry skipped."
         }
     }
 
-    end {}
+    End {}
 }
 
 Function Test-RegistryHiveMounted {
@@ -994,8 +998,6 @@ function Mount-RegistryHive {
         $result
     }
 }
-
-
 
 Function Dismount-RegistryHive {
     <#
