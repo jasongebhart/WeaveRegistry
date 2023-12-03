@@ -27,7 +27,7 @@
     # Functions to export from the module
     FunctionsToExport = @(
         'ConvertFrom-GPPreferenceXML',
-        'Compare-RegistryPropertyByObject',
+        'Compare-RegistryObject',
         'Set-RegistryPropertyByObject',
         'Set-Registry',
         'Mount-RegistryHive',

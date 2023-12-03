@@ -61,7 +61,7 @@ function Expand-String {
     }
 }
 
-Function Compare-RegistryPropertyByObject {
+Function Compare-RegistryObject {
     <#
     .SYNOPSIS
     Compares registry properties based on the provided settings.
@@ -97,7 +97,7 @@ Function Compare-RegistryPropertyByObject {
         Code = 'Injfo'
     }
 
-    $Settings | Compare-RegistryPropertyByObject
+    $Settings | Compare-RegistryObject
     # Compares the specified registry property using the provided settings.
 
     .NOTES
@@ -798,7 +798,50 @@ function Set-RegistryPropertyByObject {
             Write-Verbose -Message "[$($MyInvocation.MyCommand)] - Registry Set Start-------------"
 
             # Standardize Hive and Key Path 
-            # ... (rest of your code)
+       # XML Objects created by exporting a GPO preference will have a HIVE 
+            # value that requires conversion to short format (i.e., HKEY_LOCAL_MACHINE to HKLM:).
+            # The key path is defined separately from the hive as well and will need to be joined.
+            # Other registry objects already use short naming (HKLM:) and the key Path 
+            # is already merged with the it. Therefore, they require no conversion.
+            If ($hive) {
+                $Shorthive = Convert-RegistryHive -HiveFullName $hive
+                Write-Verbose -Message "[$($MyInvocation.MyCommand)] - Hive: $hive"
+                Write-Verbose -Message "[$($MyInvocation.MyCommand)] - Short Hive: $Shorthive"
+                switch ($Shorthive) {
+                    "HKU:"
+                     {
+                        $PSHiveName = "HKU"
+                        If (-not(Get-PSDrive -Name $PSHiveName -ea SilentlyContinue)) {
+                            Write-Verbose -Message "[$($MyInvocation.MyCommand)] - Drive $PSHiveName does not exist"
+                            Write-Verbose -Message "[$($MyInvocation.MyCommand)] - Mapping Drive $hive"
+                            New-PSDrive -PSProvider Registry -Name $PSHiveName -Root $hive | Out-null
+                            If (-not(Test-Path -Path $Shorthive)) {
+                                Write-Verbose -Message "[$($MyInvocation.MyCommand)] - Drive $Shorthive still does not exist"
+                            }
+                        }
+                     }
+                    "HKCR:"
+                     {
+                        $PSHiveName = "HKCR"
+                        Write-Verbose -Message "[$($MyInvocation.MyCommand)] - Mapping Drive to $hive"
+                        If (-not(Test-Path -Path $Shorthive)) {
+                            New-PSDrive -PSProvider Registry -Name $PSHiveName -Root $hive | Out-Null
+                           }
+                    }
+                    
+                    Default
+                     {
+                         Write-Verbose -Message "[$($MyInvocation.MyCommand)] - Short Hive($shorthive) is not HKU or HKCR"    
+                    }
+                }
+                If(Test-Path -Path $Shorthive) {
+                    $RegPath = Join-path -path $Shorthive -ChildPath $setting.key
+                } else {
+                    Write-Verbose -Message "[$($MyInvocation.MyCommand)] - path is unavailable $Shorthive"
+                }
+            } 
+            Write-Verbose -Message "[$($MyInvocation.MyCommand)] - Lookup Hive: $hive"
+            Write-Verbose -Message "[$($MyInvocation.MyCommand)] - Lookup Registry Path: $RegPath"
 
             If ($RegType -eq 'REG_DWORD'){
                 $RegValue = Convert-HexToInteger -HexValue $RegValue

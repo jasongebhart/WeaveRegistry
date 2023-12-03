@@ -5,10 +5,13 @@ This PowerShell script provides functions for managing Windows Registry settings
 
 ## Functions
 
+### Assert-RegistryValuesEqual
+Compares the actual registry value to a reference value, considering the registry data type.
+
 ### Expand-String
 Expands environment variables in a given string.
 
-### Compare-RegistryPropertyByObject
+### Compare-RegistryObject
 Compares registry settings based on the provided object.
 
 ### Convert-RegistryType
